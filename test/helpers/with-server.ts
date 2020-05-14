@@ -22,7 +22,7 @@ const generateHook = ({install, options: testServerOptions}: {install?: boolean;
 	}) as ExtendedTestServer;
 
 	const options: InstanceDefaults = {
-		// @ts-ignore Augmenting for test detection
+		// @ts-expect-error Augmenting for test detection
 		avaTest: t.title,
 		handlers: [
 			(options, next) => {
@@ -30,7 +30,7 @@ const generateHook = ({install, options: testServerOptions}: {install?: boolean;
 
 				clock.tick(0);
 
-				// @ts-ignore FIXME: Incompatible union type signatures
+				// @ts-expect-error FIXME: Incompatible union type signatures
 				result.on('response', () => {
 					clock.tick(0);
 				});

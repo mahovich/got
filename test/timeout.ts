@@ -85,12 +85,12 @@ test.serial('socket timeout', async t => {
 			retry: 0,
 			request: () => {
 				const stream = new PassThroughStream();
-				// @ts-ignore Mocking the behaviour of a ClientRequest
+				// @ts-expect-error Mocking the behaviour of a ClientRequest
 				stream.setTimeout = (ms, callback) => {
 					process.nextTick(callback);
 				};
 
-				// @ts-ignore Mocking the behaviour of a ClientRequest
+				// @ts-expect-error Mocking the behaviour of a ClientRequest
 				stream.abort = () => {};
 				stream.resume();
 
@@ -228,7 +228,7 @@ test.serial('connect timeout', withServerAndLolex, async (t, _server, got, clock
 		got({
 			createConnection: options => {
 				const socket = new net.Socket(options as object as net.SocketConstructorOpts);
-				// @ts-ignore We know that it is readonly, but we have to test it
+				// @ts-expect-error We know that it is readonly, but we have to test it
 				socket.connecting = true;
 				setImmediate(() => {
 					socket.emit('lookup', null, '127.0.0.1', 4, 'localhost');
@@ -256,7 +256,7 @@ test.serial('connect timeout (ip address)', withServerAndLolex, async (t, _serve
 			prefixUrl: '',
 			createConnection: options => {
 				const socket = new net.Socket(options as object as net.SocketConstructorOpts);
-				// @ts-ignore We know that it is readonly, but we have to test it
+				// @ts-expect-error We know that it is readonly, but we have to test it
 				socket.connecting = true;
 				return socket;
 			},
@@ -279,7 +279,7 @@ test.serial('secureConnect timeout', withServerAndLolex, async (t, _server, got,
 		got.secure({
 			createConnection: options => {
 				const socket = new net.Socket(options as object as net.SocketConstructorOpts);
-				// @ts-ignore We know that it is readonly, but we have to test it
+				// @ts-expect-error We know that it is readonly, but we have to test it
 				socket.connecting = true;
 				setImmediate(() => {
 					socket.emit('lookup', null, '127.0.0.1', 4, 'localhost');
@@ -321,7 +321,6 @@ test.serial('lookup timeout', withServerAndLolex, async (t, server, got, clock) 
 
 	await t.throwsAsync(
 		got({
-			// @ts-ignore Manual tests
 			lookup: () => {},
 			timeout: {lookup: 1},
 			retry: 0
@@ -441,7 +440,7 @@ test.serial('no unhandled timeout errors', withServer, async (t, _server, got) =
 		retry: 0,
 		timeout: 100,
 		request: (...args: any[]) => {
-			// @ts-ignore
+			// @ts-expect-error
 			const result = http.request(...args);
 
 			result.once('socket', () => {
@@ -484,7 +483,7 @@ test.serial('no more timeouts after an error', withServer, async (t, _server, go
 	const {setTimeout} = global;
 	const {clearTimeout} = global;
 
-	// @ts-ignore
+	// @ts-expect-error
 	global.setTimeout = (callback, _ms, ...args) => {
 		const timeout = {
 			isCleared: false
@@ -501,10 +500,9 @@ test.serial('no more timeouts after an error', withServer, async (t, _server, go
 		return timeout;
 	};
 
-	// @ts-ignore
 	global.clearTimeout = timeout => {
 		if (timeout) {
-			// @ts-ignore
+			// @ts-expect-error
 			timeout.isCleared = true;
 		}
 	};
@@ -602,13 +600,13 @@ test.serial('doesn\'t throw on early lookup', withServerAndLolex, async (t, serv
 			lookup: 1
 		},
 		retry: 0,
-		// @ts-ignore
+		// @ts-expect-error
 		lookup: (...[_hostname, options, callback]: Parameters<CacheableLookup['lookup']>) => {
 			if (typeof options === 'function') {
 				callback = options;
 			}
 
-			// @ts-ignore This should be fixed in upstream
+			// @ts-expect-error This should be fixed in upstream
 			callback(null, '127.0.0.1', 4);
 		}
 	}));

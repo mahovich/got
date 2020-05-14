@@ -10,7 +10,7 @@ import https = require('https');
 import timer, {ClientRequestWithTimings, Timings, IncomingMessageWithTimings} from '@szmarczak/http-timer';
 import CacheableLookup from 'cacheable-lookup';
 import CacheableRequest = require('cacheable-request');
-// @ts-ignore Missing types
+// @ts-expect-error Missing types
 import http2wrapper = require('http2-wrapper');
 import lowercaseKeys = require('lowercase-keys');
 import ResponseLike = require('responselike');
@@ -297,7 +297,7 @@ const setNonEnumerableProperties = (sources: Array<Options | Defaults | undefine
 				writable: true,
 				configurable: true,
 				enumerable: false,
-				// @ts-ignore TS doesn't see the check above
+				// @ts-expect-error TS doesn't see the check above
 				value: source[name]
 			};
 		}
@@ -533,7 +533,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 				if (kIsNormalizedAlready in nonNormalizedOptions) {
 					this.options = nonNormalizedOptions as NormalizedOptions;
 				} else {
-					// @ts-ignore Common TypeScript bug saying that `this.constructor` is not accessible
+					// @ts-expect-error Common TypeScript bug saying that `this.constructor` is not accessible
 					this.options = this.constructor.normalizeArguments(url, nonNormalizedOptions, defaults);
 				}
 
@@ -1207,7 +1207,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 			this._unlockWrite();
 
 			if (!is.undefined(body)) {
-				this._writeRequest(body, null as unknown as string, () => {});
+				this._writeRequest(body, null as unknown as BufferEncoding, () => {});
 				currentRequest.end();
 
 				this._lockWrite();
@@ -1280,7 +1280,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 			const result = await hook(options);
 
 			if (!is.undefined(result)) {
-				// @ts-ignore Skip the type mismatch to support abstract responses
+				// @ts-expect-error Skip the type mismatch to support abstract responses
 				options.request = () => result;
 				break;
 			}
@@ -1426,7 +1426,7 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 		}
 	}
 
-	_write(chunk: any, encoding: string, callback: (error?: Error | null) => void): void {
+	_write(chunk: any, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
 		const write = (): void => {
 			this._writeRequest(chunk, encoding, callback);
 		};
@@ -1438,9 +1438,9 @@ export default class Request extends Duplex implements RequestEvents<Request> {
 		}
 	}
 
-	_writeRequest(chunk: any, encoding: string, callback: (error?: Error | null) => void): void {
+	_writeRequest(chunk: any, encoding: BufferEncoding, callback: (error?: Error | null) => void): void {
 		this._progressCallbacks.push((): void => {
-			this[kUploadedSize] += Buffer.byteLength(chunk, encoding as BufferEncoding);
+			this[kUploadedSize] += Buffer.byteLength(chunk, encoding);
 
 			const progress = this.uploadProgress;
 
